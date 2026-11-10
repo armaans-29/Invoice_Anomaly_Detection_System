@@ -8,39 +8,20 @@
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Open_the_App-FF4B4B?style=for-the-badge)](https://invoice-anomaly-detection-system.streamlit.app/)
 
+## <i> Contents </i>
 
 **<a href="#the-problem">Problem</a>** &nbsp;·&nbsp; **<a href="#the-solution">Solution</a>** &nbsp;·&nbsp; **<a href="#how-it-works">How It Works</a>** &nbsp;·&nbsp; **<a href="#ocr-deep-dive">OCR Deep Dive</a>** &nbsp;·&nbsp; **<a href="#engineering-decisions">Engineering Decisions</a>** &nbsp;·&nbsp; **<a href="#architecture">Architecture</a>** &nbsp;·&nbsp; **<a href="#quick-start">Quick Start</a>** &nbsp;·&nbsp; **<a href="#demo-dataset">Demo Dataset</a>** &nbsp;·&nbsp; **<a href="#quality-assurance">Quality Assurance</a>** &nbsp;·&nbsp; **<a href="#configuration--security">Configuration & Security</a>** &nbsp;·&nbsp; **<a href="#scope--limitations">Scope & Limitations</a>**
-
-
 
 
 </div>
 
 ---
+--->>> <i>Open the app, upload an invoice (PDF or image), and watch it extract, verify, score and explain, with no installation needed. If the app has been idle, it may take a short moment to wake up.</i>
 
-Open the app, upload an invoice (PDF or image), and watch it extract, verify, score and explain, with no installation needed. If the app has been idle, it may take a short moment to wake up.
-
-**Suggested 60-second tour:**
-1. Upload `sample_01_vat_invoice_clean.pdf` → **Passed Checks**.
-2. Upload `sample_03_gst_invoice_errors.pdf` → **High Risk**, with every arithmetic and tax error pinpointed.
-3. Upload `sample_04_duplicate_of_01.pdf` → **Exact duplicate** detected.
-4. Approve or reject an invoice, then press **Verify** on the audit log to see the hash chain confirmed.
-
----
-
-## Table of Contents
-
-1. [The Problem](#1-the-problem)
-2. [The Solution](#2-the-solution)
-3. [How It Works](#3-how-it-works)
-4. [OCR Deep Dive](#4-ocr-deep-dive)
-5. [Engineering Decisions](#5-engineering-decisions)
-6. [Architecture](#6-architecture)
-7. [Quick Start](#7-quick-start)
-8. [Demo Dataset](#8-demo-dataset)
-9. [Quality Assurance](#9-quality-assurance)
-10. [Configuration & Security](#10-configuration--security)
-11. [Scope & Limitations](#11-scope--limitations)
+1.  Upload `sample_01_vat_invoice_clean.pdf` → **Passed Checks**.
+2.  Upload `sample_03_gst_invoice_errors.pdf` → **High Risk**, with every arithmetic and tax error pinpointed.
+3.  Upload `sample_04_duplicate_of_01.pdf` → **Exact duplicate** detected.
+4.  Approve or reject an invoice, then press **Verify** on the audit log to see the hash chain confirmed.
 
 ---
 
