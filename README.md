@@ -2,13 +2,16 @@
 
 #  Invoice Anomaly Detection System
 
-### Trust, but verify: every invoice, every number, every decision.
 
 **An invoice-verification engine that reads documents with OCR, re-derives the math independently, reconciles against purchase orders and goods receipts, and records every human decision in a tamper-evident audit trail.**
 
-<br>
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Open_the_App-FF4B4B?style=for-the-badge)](https://invoice-anomaly-detection-system.streamlit.app/)
+
+
+**<a href="#the-problem">Problem</a>** &nbsp;·&nbsp; **<a href="#the-solution">Solution</a>** &nbsp;·&nbsp; **<a href="#how-it-works">How It Works</a>** &nbsp;·&nbsp; **<a href="#ocr-deep-dive">OCR Deep Dive</a>** &nbsp;·&nbsp; **<a href="#engineering-decisions">Engineering Decisions</a>** &nbsp;·&nbsp; **<a href="#architecture">Architecture</a>** &nbsp;·&nbsp; **<a href="#quick-start">Quick Start</a>** &nbsp;·&nbsp; **<a href="#demo-dataset">Demo Dataset</a>** &nbsp;·&nbsp; **<a href="#quality-assurance">Quality Assurance</a>** &nbsp;·&nbsp; **<a href="#configuration--security">Configuration & Security</a>** &nbsp;·&nbsp; **<a href="#scope--limitations">Scope & Limitations</a>**
+
+
 
 
 </div>
