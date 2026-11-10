@@ -1,4 +1,4 @@
-# 🛡️ InvoiceShield AI
+#  Invoice Detection System
 
 A Streamlit prototype that reads invoices (PDF or image), extracts the key fields and
 line items, **independently re-checks the arithmetic and tax**, flags duplicates, reconciles
