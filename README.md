@@ -62,63 +62,143 @@ The real requirement is not just to *extract* data from an invoice. It is to **i
 
 InvoiceShield AI treats every invoice as a **claim to be audited**, not a fact to be ingested.
 
-### System Overview
+### System Overview: The Invoice Verification Tree
 
-The diagram below shows the full journey of a single invoice, from upload to a sealed, verifiable decision.
+One invoice, eight branches. Read the tree from left to right: the **numbers ① – ⑧** show the order in which an invoice travels, and every leaf is a real tool, check or outcome inside the project.
 
 ```mermaid
-flowchart TB
-    A["📄 <b>Invoice</b><br/>PDF or image"] --> B{"Text layer<br/>in the file?"}
+flowchart LR
+    ROOT(("🛡️<br/><b>INVOICE<br/>ANOMALY<br/>DETECTION<br/>SYSTEM</b>"))
 
-    subgraph READ ["① READ"]
-        direction TB
-        B -- "Yes (digital PDF)" --> C["<b>PyMuPDF</b><br/>exact embedded text"]
-        B -- "No (scan / photo)" --> D["<b>EasyOCR</b><br/>detect + recognise text"]
-        D --> E["<b>Regroup boxes</b><br/>into visual rows"]
-    end
+    %% ───────────── ① INGEST ─────────────
+    ROOT ==> B1["<b>① INGEST</b><br/>read any invoice"]
+    B1 --> I1["📄 Digital PDF<br/>has a text layer"]
+    I1 --> I1a["<b>PyMuPDF</b><br/>exact characters"]
+    B1 --> I2["🖼️ Scan or image<br/>no text layer"]
+    I2 --> I2a["<b>EasyOCR</b><br/>detect + recognise"]
+    I2a --> I2b["<b>Box regrouping</b><br/>boxes → visual rows"]
 
-    C --> F
-    E --> F
+    %% ───────────── ② EXTRACT ─────────────
+    ROOT ==> B2["<b>② EXTRACT</b><br/>turn text into fields"]
+    B2 --> E1["🏷️ Header fields"]
+    E1 --> E1a["invoice no · dates · supplier<br/>GSTIN / VAT · buyer · PO ref"]
+    B2 --> E2["💰 Amounts"]
+    E2 --> E2a["subtotal · discount · shipping<br/>CGST · SGST · IGST · total"]
+    B2 --> E3["🧾 Line items"]
+    E3 --> E3a["<b>Table parser</b><br/>column-order aware"]
+    E3 --> E3b["<b>Receipt parser</b><br/>Label: amount"]
+    B2 --> E4["🩹 OCR repair"]
+    E4 --> E4a["drop stray leading digit<br/>only if invoice reconciles"]
+    E4a --> E4b["⚠️ Review Required<br/>repair shown as a finding"]
+    B2 --> E5["💱 Currency"]
+    E5 --> E5a["GST found, no symbol<br/>→ INR, inference disclosed"]
 
-    subgraph EXTRACT ["② EXTRACT"]
-        F["<b>Structured fields</b><br/>supplier · dates · tax ids · totals<br/>+ line items"]
-    end
+    %% ───────────── ③ VALIDATE ─────────────
+    ROOT ==> B3["<b>③ VALIDATE</b><br/>re-compute the math"]
+    B3 --> V1["📏 Line level"]
+    V1 --> V1a["qty × rate = line total"]
+    B3 --> V2["➕ Totals"]
+    V2 --> V2a["Σ lines = subtotal"]
+    V2 --> V2b["subtotal − discount<br/>+ shipping + tax = total"]
+    B3 --> V3["🏛️ Tax"]
+    V3 --> V3a["VAT / GST rate check"]
+    V3 --> V3b["CGST + SGST + IGST<br/>= total tax"]
+    V3 --> V3c["IGST vs CGST/SGST<br/>conflict"]
+    B3 --> V4["📋 Completeness"]
+    V4 --> V4a["missing required fields"]
 
-    F --> G
+    %% ───────────── ④ DUPLICATES ─────────────
+    ROOT ==> B4["<b>④ DUPLICATES</b><br/>have we seen this?"]
+    B4 --> D1["🔍 Signals compared"]
+    D1 --> D1a["fuzzy invoice no<br/>+ supplier"]
+    D1 --> D1b["amount · date<br/>PO reference"]
+    D1 --> D1c["file hash"]
+    B4 --> D2["⚖️ Verdict"]
+    D2 --> D2a["🔴 Exact"]
+    D2 --> D2b["🟠 Probable"]
+    D2 --> D2c["🟡 Similar"]
 
-    subgraph VERIFY ["③ VERIFY INDEPENDENTLY"]
-        direction TB
-        G["<b>Re-compute the math</b><br/>qty × rate · line sums · subtotal<br/>tax · grand total · GST split"]
-        G --> H["<b>Cross-check</b><br/>duplicates · purchase order<br/>· goods receipt"]
-        H --> I["<b>Explainable risk score</b><br/>0 – 100 with named indicators"]
-    end
+    %% ───────────── ⑤ RECONCILE ─────────────
+    ROOT ==> B5["<b>⑤ RECONCILE</b><br/>match the paperwork"]
+    B5 --> R1["📑 Invoice ↔ Purchase Order"]
+    R1 --> R1a["price"]
+    R1 --> R1b["quantity"]
+    R1 --> R1c["supplier"]
+    B5 --> R2["📦 Invoice ↔ Goods Receipt"]
+    R2 --> R2a["over-billing<br/>detection"]
 
-    I --> J
+    %% ───────────── ⑥ RISK ─────────────
+    ROOT ==> B6["<b>⑥ RISK</b><br/>explainable score"]
+    B6 --> K1["🎯 Additive score<br/>0 – 100"]
+    K1 --> K1a["every point traces to<br/>a named indicator"]
+    B6 --> K2["🚦 Outcome"]
+    K2 --> K2a["✅ Passed Checks"]
+    K2 --> K2b["🟡 Review Required"]
+    K2 --> K2c["🔴 High Risk"]
+    K2 --> K2d["⚪ Insufficient Evidence"]
 
-    subgraph DECIDE ["④ DECIDE & PROVE"]
-        direction TB
-        J["👤 <b>Human review</b><br/>approve · reject · request info"]
-        J --> K[("🔗 <b>Hash-chained audit log</b><br/>SHA-256, tamper-evident")]
-        J --> L["📊 <b>Reports</b><br/>PDF and Excel"]
-    end
+    %% ───────────── ⑦ DECIDE & AUDIT ─────────────
+    ROOT ==> B7["<b>⑦ DECIDE & AUDIT</b><br/>human in control"]
+    B7 --> H1["👤 Reviewer action"]
+    H1 --> H1a["Approve"]
+    H1 --> H1b["Reject"]
+    H1 --> H1c["Request info"]
+    H1 --> H1d["+ comment"]
+    B7 --> H2["🔗 Hash-chained log"]
+    H2 --> H2a["<b>SHA-256</b><br/>(previous hash + event)"]
+    H2a --> H2b["✔ Verify → pinpoints<br/>first altered entry"]
 
-    classDef input fill:#E3F2FD,stroke:#1565C0,stroke-width:2px,color:#0D47A1
-    classDef read fill:#FFF3E0,stroke:#EF6C00,stroke-width:2px,color:#E65100
-    classDef extract fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px,color:#4A148C
-    classDef verify fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px,color:#1B5E20
-    classDef decide fill:#FFEBEE,stroke:#C62828,stroke-width:2px,color:#B71C1C
+    %% ───────────── ⑧ OUTPUT & STORAGE ─────────────
+    ROOT ==> B8["<b>⑧ OUTPUT & STORAGE</b><br/>keep it safe"]
+    B8 --> O1["📊 Reports"]
+    O1 --> O1a["PDF"]
+    O1 --> O1b["Excel"]
+    B8 --> O2["🗄️ Storage"]
+    O2 --> O2a["<b>SQLite</b>"]
+    O2 --> O2b["<b>Fernet</b><br/>encryption at rest"]
+    B8 --> O3["🖥️ Interface"]
+    O3 --> O3a["<b>Streamlit</b><br/>web app"]
 
-    class A,B input
-    class C,D,E read
-    class F extract
-    class G,H,I verify
-    class J,K,L decide
+    %% ───────────── STYLES ─────────────
+    classDef root fill:#0D1B2A,stroke:#00B4D8,stroke-width:4px,color:#FFFFFF,font-size:16px
+    classDef b1 fill:#EF6C00,stroke:#BF360C,stroke-width:3px,color:#FFFFFF
+    classDef b2 fill:#7B1FA2,stroke:#4A148C,stroke-width:3px,color:#FFFFFF
+    classDef b3 fill:#2E7D32,stroke:#1B5E20,stroke-width:3px,color:#FFFFFF
+    classDef b4 fill:#C62828,stroke:#7F0000,stroke-width:3px,color:#FFFFFF
+    classDef b5 fill:#1565C0,stroke:#0D47A1,stroke-width:3px,color:#FFFFFF
+    classDef b6 fill:#F9A825,stroke:#F57F17,stroke-width:3px,color:#212121
+    classDef b7 fill:#00838F,stroke:#006064,stroke-width:3px,color:#FFFFFF
+    classDef b8 fill:#455A64,stroke:#263238,stroke-width:3px,color:#FFFFFF
 
-    style READ fill:#FFFBF5,stroke:#EF6C00,stroke-dasharray: 5 5
-    style EXTRACT fill:#FDF8FE,stroke:#7B1FA2,stroke-dasharray: 5 5
-    style VERIFY fill:#F7FCF7,stroke:#2E7D32,stroke-dasharray: 5 5
-    style DECIDE fill:#FFF8F8,stroke:#C62828,stroke-dasharray: 5 5
+    classDef l1 fill:#FFF3E0,stroke:#EF6C00,color:#E65100
+    classDef l2 fill:#F3E5F5,stroke:#7B1FA2,color:#4A148C
+    classDef l3 fill:#E8F5E9,stroke:#2E7D32,color:#1B5E20
+    classDef l4 fill:#FFEBEE,stroke:#C62828,color:#B71C1C
+    classDef l5 fill:#E3F2FD,stroke:#1565C0,color:#0D47A1
+    classDef l6 fill:#FFFDE7,stroke:#F9A825,color:#8D6E00
+    classDef l7 fill:#E0F7FA,stroke:#00838F,color:#006064
+    classDef l8 fill:#ECEFF1,stroke:#455A64,color:#263238
+
+    class ROOT root
+    class B1 b1
+    class B2 b2
+    class B3 b3
+    class B4 b4
+    class B5 b5
+    class B6 b6
+    class B7 b7
+    class B8 b8
+    class I1,I1a,I2,I2a,I2b l1
+    class E1,E1a,E2,E2a,E3,E3a,E3b,E4,E4a,E4b,E5,E5a l2
+    class V1,V1a,V2,V2a,V2b,V3,V3a,V3b,V3c,V4,V4a l3
+    class D1,D1a,D1b,D1c,D2,D2a,D2b,D2c l4
+    class R1,R1a,R1b,R1c,R2,R2a l5
+    class K1,K1a,K2,K2a,K2b,K2c,K2d l6
+    class H1,H1a,H1b,H1c,H1d,H2,H2a,H2b l7
+    class O1,O1a,O1b,O2,O2a,O2b,O3,O3a l8
 ```
+
+**How to read it:** the thick **trunk** lines carry an invoice from the root into each stage. The **branches** are the stages, the **twigs** are the capabilities inside each stage, and the **leaves** are the concrete tools, checks and outcomes you can see working in the live app.
 
 **Four principles guide the design:**
 
