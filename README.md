@@ -1,5 +1,10 @@
 <div align="center">
 
+<p align="center">
+  <img src="docs/invoice-verification-tree.svg" width="720" alt="Invoice Verification Tree: eight stages from ingest to output">
+</p>
+
+
 #  Invoice Anomaly Detection System
 
 ### Trust, but verify: every invoice, every number, every decision.
@@ -68,107 +73,52 @@ One invoice, eight branches. Read the tree from left to right: the **numbers ①
 
 ```mermaid
 flowchart LR
-    ROOT(("🛡️<br/><b>INVOICE<br/>ANOMALY<br/>DETECTION<br/>SYSTEM</b>"))
+    ROOT(("🛡️<br/><b>INVOICE<br/>ANOMALY<br/>DETECTION</b>"))
 
-    %% ───────────── ① INGEST ─────────────
-    ROOT ==> B1["<b>① INGEST</b><br/>read any invoice"]
-    B1 --> I1["📄 Digital PDF<br/>has a text layer"]
-    I1 --> I1a["<b>PyMuPDF</b><br/>exact characters"]
-    B1 --> I2["🖼️ Scan or image<br/>no text layer"]
-    I2 --> I2a["<b>EasyOCR</b><br/>detect + recognise"]
-    I2a --> I2b["<b>Box regrouping</b><br/>boxes → visual rows"]
+    ROOT ==> B1["<b>① INGEST</b>"]
+    B1 --> I1["📄 Digital PDF<br/><b>PyMuPDF</b>"]
+    B1 --> I2["🖼️ Scan / image<br/><b>EasyOCR</b>"]
+    I2 --> I3["Box regrouping<br/>into visual rows"]
 
-    %% ───────────── ② EXTRACT ─────────────
-    ROOT ==> B2["<b>② EXTRACT</b><br/>turn text into fields"]
-    B2 --> E1["🏷️ Header fields"]
-    E1 --> E1a["invoice no · dates · supplier<br/>GSTIN / VAT · buyer · PO ref"]
-    B2 --> E2["💰 Amounts"]
-    E2 --> E2a["subtotal · discount · shipping<br/>CGST · SGST · IGST · total"]
-    B2 --> E3["🧾 Line items"]
-    E3 --> E3a["<b>Table parser</b><br/>column-order aware"]
-    E3 --> E3b["<b>Receipt parser</b><br/>Label: amount"]
-    B2 --> E4["🩹 OCR repair"]
-    E4 --> E4a["drop stray leading digit<br/>only if invoice reconciles"]
-    E4a --> E4b["⚠️ Review Required<br/>repair shown as a finding"]
-    B2 --> E5["💱 Currency"]
-    E5 --> E5a["GST found, no symbol<br/>→ INR, inference disclosed"]
+    ROOT ==> B2["<b>② EXTRACT</b>"]
+    B2 --> E1["🏷️ Fields<br/>header · tax ids · amounts"]
+    B2 --> E2["🧾 Line items<br/>table + receipt parser"]
+    B2 --> E3["🩹 OCR repair<br/>→ Review Required"]
 
-    %% ───────────── ③ VALIDATE ─────────────
-    ROOT ==> B3["<b>③ VALIDATE</b><br/>re-compute the math"]
-    B3 --> V1["📏 Line level"]
-    V1 --> V1a["qty × rate = line total"]
-    B3 --> V2["➕ Totals"]
-    V2 --> V2a["Σ lines = subtotal"]
-    V2 --> V2b["subtotal − discount<br/>+ shipping + tax = total"]
-    B3 --> V3["🏛️ Tax"]
-    V3 --> V3a["VAT / GST rate check"]
-    V3 --> V3b["CGST + SGST + IGST<br/>= total tax"]
-    V3 --> V3c["IGST vs CGST/SGST<br/>conflict"]
-    B3 --> V4["📋 Completeness"]
-    V4 --> V4a["missing required fields"]
+    ROOT ==> B3["<b>③ VALIDATE</b>"]
+    B3 --> V1["➕ Math<br/>qty × rate · Σ lines · total"]
+    B3 --> V2["🏛️ Tax + completeness<br/>GST rate · CGST/SGST/IGST<br/>conflict · missing fields"]
 
-    %% ───────────── ④ DUPLICATES ─────────────
-    ROOT ==> B4["<b>④ DUPLICATES</b><br/>have we seen this?"]
-    B4 --> D1["🔍 Signals compared"]
-    D1 --> D1a["fuzzy invoice no<br/>+ supplier"]
-    D1 --> D1b["amount · date<br/>PO reference"]
-    D1 --> D1c["file hash"]
-    B4 --> D2["⚖️ Verdict"]
-    D2 --> D2a["🔴 Exact"]
-    D2 --> D2b["🟠 Probable"]
-    D2 --> D2c["🟡 Similar"]
+    ROOT ==> B4["<b>④ DUPLICATES</b>"]
+    B4 --> D1["🔍 Fuzzy invoice no · supplier<br/>amount · date · PO · file hash"]
+    D1 --> D2["Exact · Probable · Similar"]
 
-    %% ───────────── ⑤ RECONCILE ─────────────
-    ROOT ==> B5["<b>⑤ RECONCILE</b><br/>match the paperwork"]
-    B5 --> R1["📑 Invoice ↔ Purchase Order"]
-    R1 --> R1a["price"]
-    R1 --> R1b["quantity"]
-    R1 --> R1c["supplier"]
-    B5 --> R2["📦 Invoice ↔ Goods Receipt"]
-    R2 --> R2a["over-billing<br/>detection"]
+    ROOT ==> B5["<b>⑤ RECONCILE</b>"]
+    B5 --> R1["📑 Invoice ↔ PO<br/>price · qty · supplier"]
+    B5 --> R2["📦 Invoice ↔ GRN<br/>over-billing"]
 
-    %% ───────────── ⑥ RISK ─────────────
-    ROOT ==> B6["<b>⑥ RISK</b><br/>explainable score"]
-    B6 --> K1["🎯 Additive score<br/>0 – 100"]
-    K1 --> K1a["every point traces to<br/>a named indicator"]
-    B6 --> K2["🚦 Outcome"]
-    K2 --> K2a["✅ Passed Checks"]
-    K2 --> K2b["🟡 Review Required"]
-    K2 --> K2c["🔴 High Risk"]
-    K2 --> K2d["⚪ Insufficient Evidence"]
+    ROOT ==> B6["<b>⑥ RISK</b>"]
+    B6 --> K1["🎯 Score 0 – 100<br/>named indicators"]
+    K1 --> K2["✅ Passed · 🟡 Review<br/>🔴 High Risk · ⚪ Insufficient"]
 
-    %% ───────────── ⑦ DECIDE & AUDIT ─────────────
-    ROOT ==> B7["<b>⑦ DECIDE & AUDIT</b><br/>human in control"]
-    B7 --> H1["👤 Reviewer action"]
-    H1 --> H1a["Approve"]
-    H1 --> H1b["Reject"]
-    H1 --> H1c["Request info"]
-    H1 --> H1d["+ comment"]
-    B7 --> H2["🔗 Hash-chained log"]
-    H2 --> H2a["<b>SHA-256</b><br/>(previous hash + event)"]
-    H2a --> H2b["✔ Verify → pinpoints<br/>first altered entry"]
+    ROOT ==> B7["<b>⑦ DECIDE & AUDIT</b>"]
+    B7 --> H1["👤 Approve · Reject<br/>Request info"]
+    B7 --> H2["🔗 <b>SHA-256</b> hash chain"]
+    H2 --> H3["✔ Verify tampering"]
 
-    %% ───────────── ⑧ OUTPUT & STORAGE ─────────────
-    ROOT ==> B8["<b>⑧ OUTPUT & STORAGE</b><br/>keep it safe"]
-    B8 --> O1["📊 Reports"]
-    O1 --> O1a["PDF"]
-    O1 --> O1b["Excel"]
-    B8 --> O2["🗄️ Storage"]
-    O2 --> O2a["<b>SQLite</b>"]
-    O2 --> O2b["<b>Fernet</b><br/>encryption at rest"]
-    B8 --> O3["🖥️ Interface"]
-    O3 --> O3a["<b>Streamlit</b><br/>web app"]
+    ROOT ==> B8["<b>⑧ OUTPUT</b>"]
+    B8 --> O1["📊 PDF + Excel reports"]
+    B8 --> O2["🗄️ <b>SQLite</b> · <b>Fernet</b><br/>🖥️ <b>Streamlit</b>"]
 
-    %% ───────────── STYLES ─────────────
-    classDef root fill:#0D1B2A,stroke:#00B4D8,stroke-width:4px,color:#FFFFFF,font-size:16px
-    classDef b1 fill:#EF6C00,stroke:#BF360C,stroke-width:3px,color:#FFFFFF
-    classDef b2 fill:#7B1FA2,stroke:#4A148C,stroke-width:3px,color:#FFFFFF
-    classDef b3 fill:#2E7D32,stroke:#1B5E20,stroke-width:3px,color:#FFFFFF
-    classDef b4 fill:#C62828,stroke:#7F0000,stroke-width:3px,color:#FFFFFF
-    classDef b5 fill:#1565C0,stroke:#0D47A1,stroke-width:3px,color:#FFFFFF
-    classDef b6 fill:#F9A825,stroke:#F57F17,stroke-width:3px,color:#212121
-    classDef b7 fill:#00838F,stroke:#006064,stroke-width:3px,color:#FFFFFF
-    classDef b8 fill:#455A64,stroke:#263238,stroke-width:3px,color:#FFFFFF
+    classDef root fill:#0D1B2A,stroke:#00B4D8,stroke-width:3px,color:#FFFFFF
+    classDef b1 fill:#EF6C00,stroke:#BF360C,stroke-width:2px,color:#FFFFFF
+    classDef b2 fill:#7B1FA2,stroke:#4A148C,stroke-width:2px,color:#FFFFFF
+    classDef b3 fill:#2E7D32,stroke:#1B5E20,stroke-width:2px,color:#FFFFFF
+    classDef b4 fill:#C62828,stroke:#7F0000,stroke-width:2px,color:#FFFFFF
+    classDef b5 fill:#1565C0,stroke:#0D47A1,stroke-width:2px,color:#FFFFFF
+    classDef b6 fill:#F9A825,stroke:#F57F17,stroke-width:2px,color:#212121
+    classDef b7 fill:#00838F,stroke:#006064,stroke-width:2px,color:#FFFFFF
+    classDef b8 fill:#455A64,stroke:#263238,stroke-width:2px,color:#FFFFFF
 
     classDef l1 fill:#FFF3E0,stroke:#EF6C00,color:#E65100
     classDef l2 fill:#F3E5F5,stroke:#7B1FA2,color:#4A148C
@@ -188,14 +138,14 @@ flowchart LR
     class B6 b6
     class B7 b7
     class B8 b8
-    class I1,I1a,I2,I2a,I2b l1
-    class E1,E1a,E2,E2a,E3,E3a,E3b,E4,E4a,E4b,E5,E5a l2
-    class V1,V1a,V2,V2a,V2b,V3,V3a,V3b,V3c,V4,V4a l3
-    class D1,D1a,D1b,D1c,D2,D2a,D2b,D2c l4
-    class R1,R1a,R1b,R1c,R2,R2a l5
-    class K1,K1a,K2,K2a,K2b,K2c,K2d l6
-    class H1,H1a,H1b,H1c,H1d,H2,H2a,H2b l7
-    class O1,O1a,O1b,O2,O2a,O2b,O3,O3a l8
+    class I1,I2,I3 l1
+    class E1,E2,E3 l2
+    class V1,V2 l3
+    class D1,D2 l4
+    class R1,R2 l5
+    class K1,K2 l6
+    class H1,H2,H3 l7
+    class O1,O2 l8
 ```
 
 **How to read it:** the thick **trunk** lines carry an invoice from the root into each stage. The **branches** are the stages, the **twigs** are the capabilities inside each stage, and the **leaves** are the concrete tools, checks and outcomes you can see working in the live app.
