@@ -62,9 +62,62 @@ The real requirement is not just to *extract* data from an invoice. It is to **i
 
 InvoiceShield AI treats every invoice as a **claim to be audited**, not a fact to be ingested.
 
-```
- Document ─► Read ─► Extract ─► Re-verify ─► Cross-check ─► Score ─► Human decision ─► Sealed audit log
-(PDF/image) (OCR)   (fields)   (own math)   (dupes,PO,GRN) (explainable) (approve/reject)  (hash-chained)
+### System Overview
+
+The diagram below shows the full journey of a single invoice, from upload to a sealed, verifiable decision.
+
+```mermaid
+flowchart TB
+    A["📄 <b>Invoice</b><br/>PDF or image"] --> B{"Text layer<br/>in the file?"}
+
+    subgraph READ ["① READ"]
+        direction TB
+        B -- "Yes (digital PDF)" --> C["<b>PyMuPDF</b><br/>exact embedded text"]
+        B -- "No (scan / photo)" --> D["<b>EasyOCR</b><br/>detect + recognise text"]
+        D --> E["<b>Regroup boxes</b><br/>into visual rows"]
+    end
+
+    C --> F
+    E --> F
+
+    subgraph EXTRACT ["② EXTRACT"]
+        F["<b>Structured fields</b><br/>supplier · dates · tax ids · totals<br/>+ line items"]
+    end
+
+    F --> G
+
+    subgraph VERIFY ["③ VERIFY INDEPENDENTLY"]
+        direction TB
+        G["<b>Re-compute the math</b><br/>qty × rate · line sums · subtotal<br/>tax · grand total · GST split"]
+        G --> H["<b>Cross-check</b><br/>duplicates · purchase order<br/>· goods receipt"]
+        H --> I["<b>Explainable risk score</b><br/>0 – 100 with named indicators"]
+    end
+
+    I --> J
+
+    subgraph DECIDE ["④ DECIDE & PROVE"]
+        direction TB
+        J["👤 <b>Human review</b><br/>approve · reject · request info"]
+        J --> K[("🔗 <b>Hash-chained audit log</b><br/>SHA-256, tamper-evident")]
+        J --> L["📊 <b>Reports</b><br/>PDF and Excel"]
+    end
+
+    classDef input fill:#E3F2FD,stroke:#1565C0,stroke-width:2px,color:#0D47A1
+    classDef read fill:#FFF3E0,stroke:#EF6C00,stroke-width:2px,color:#E65100
+    classDef extract fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px,color:#4A148C
+    classDef verify fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px,color:#1B5E20
+    classDef decide fill:#FFEBEE,stroke:#C62828,stroke-width:2px,color:#B71C1C
+
+    class A,B input
+    class C,D,E read
+    class F extract
+    class G,H,I verify
+    class J,K,L decide
+
+    style READ fill:#FFFBF5,stroke:#EF6C00,stroke-dasharray: 5 5
+    style EXTRACT fill:#FDF8FE,stroke:#7B1FA2,stroke-dasharray: 5 5
+    style VERIFY fill:#F7FCF7,stroke:#2E7D32,stroke-dasharray: 5 5
+    style DECIDE fill:#FFF8F8,stroke:#C62828,stroke-dasharray: 5 5
 ```
 
 **Four principles guide the design:**
@@ -259,3 +312,4 @@ InvoiceShield AI is a **portfolio prototype** built to demonstrate OCR-based doc
 
 **Built to answer one question well: *"Can this invoice be trusted, and can we prove how we decided?"***
 
+</div>
