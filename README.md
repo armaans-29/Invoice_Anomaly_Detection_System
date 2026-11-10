@@ -1,10 +1,5 @@
 <div align="center">
 
-<p align="center">
-  <img src="docs/invoice-verification-tree.svg" width="720" alt="Invoice Verification Tree: eight stages from ingest to output">
-</p>
-
-
 #  Invoice Anomaly Detection System
 
 ### Trust, but verify: every invoice, every number, every decision.
