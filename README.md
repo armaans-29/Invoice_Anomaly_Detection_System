@@ -105,15 +105,15 @@ flowchart LR
     B8 --> O1["📊 PDF + Excel reports"]
     B8 --> O2["🗄️ <b>SQLite</b> · <b>Fernet</b><br/>🖥️ <b>Streamlit</b>"]
 
-    classDef root fill:#0D1B2A,stroke:#00B4D8,stroke-width:3px,color:#FFFFFF
-    classDef b1 fill:#EF6C00,stroke:#BF360C,stroke-width:2px,color:#FFFFFF
-    classDef b2 fill:#7B1FA2,stroke:#4A148C,stroke-width:2px,color:#FFFFFF
-    classDef b3 fill:#2E7D32,stroke:#1B5E20,stroke-width:2px,color:#FFFFFF
-    classDef b4 fill:#C62828,stroke:#7F0000,stroke-width:2px,color:#FFFFFF
-    classDef b5 fill:#1565C0,stroke:#0D47A1,stroke-width:2px,color:#FFFFFF
-    classDef b6 fill:#F9A825,stroke:#F57F17,stroke-width:2px,color:#212121
-    classDef b7 fill:#00838F,stroke:#006064,stroke-width:2px,color:#FFFFFF
-    classDef b8 fill:#455A64,stroke:#263238,stroke-width:2px,color:#FFFFFF
+    classDef root fill:#0D1B2A,stroke:#00B4D8,stroke-width:2px,color:#FFFFFF
+    classDef b1 fill:#EF6C00,stroke:#BF360C,stroke-width:1px,color:#FFFFFF
+    classDef b2 fill:#7B1FA2,stroke:#4A148C,stroke-width:1px,color:#FFFFFF
+    classDef b3 fill:#2E7D32,stroke:#1B5E20,stroke-width:1px,color:#FFFFFF
+    classDef b4 fill:#C62828,stroke:#7F0000,stroke-width:1px,color:#FFFFFF
+    classDef b5 fill:#1565C0,stroke:#0D47A1,stroke-width:1px,color:#FFFFFF
+    classDef b6 fill:#F9A825,stroke:#F57F17,stroke-width:1px,color:#212121
+    classDef b7 fill:#00838F,stroke:#006064,stroke-width:1px,color:#FFFFFF
+    classDef b8 fill:#455A64,stroke:#263238,stroke-width:1px,color:#FFFFFF
 
     classDef l1 fill:#FFF3E0,stroke:#EF6C00,color:#E65100
     classDef l2 fill:#F3E5F5,stroke:#7B1FA2,color:#4A148C
