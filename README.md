@@ -2,11 +2,23 @@
 
 #  Invoice Anomaly Detection System
 
-
 **An invoice-verification engine that reads documents with OCR, re-derives the math independently, reconciles against purchase orders and goods receipts, and records every human decision in a tamper-evident audit trail.**
 
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Open_the_App-FF4B4B?style=for-the-badge)](https://invoice-anomaly-detection-system.streamlit.app/)
+
+---
+## <i> Techstack </i>
+![Python](https://img.shields.io/badge/PYTHON-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/STREAMLIT-UI-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
+![PyMuPDF](https://img.shields.io/badge/PYMUPDF-PDF%20PROCESSING-2E7D32?style=for-the-badge)
+![EasyOCR](https://img.shields.io/badge/EASYOCR-OCR-6A5ACD?style=for-the-badge)
+![SQLite](https://img.shields.io/badge/SQLITE-DATABASE-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+![Fernet](https://img.shields.io/badge/FERNET-ENCRYPTION-00838F?style=for-the-badge)
+![SHA256](https://img.shields.io/badge/SHA--256-AUDIT%20TRAIL-455A64?style=for-the-badge)
+![Pytest](https://img.shields.io/badge/PYTEST-TESTING-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)
+![GitHub](https://img.shields.io/badge/GITHUB-VERSION%20CONTROL-181717?style=for-the-badge&logo=github&logoColor=white)
+
 
 ## <i> Contents </i>
 
